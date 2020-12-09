@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
 	geo "github.com/paulmach/go.geo"
@@ -52,6 +53,51 @@ func getSageNodes(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("GetSageNodes, queryStr: %s", queryStr)
+	log.Printf("\n")
+	respondJSON(w, http.StatusOK, dataOut)
+	return
+}
+
+func postSageNodes(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", mysqlDSN)
+	if err != nil {
+		err = fmt.Errorf("Unable to connect to database: %v", err)
+		return
+	}
+	defer db.Close()
+	query := r.URL.Query()
+	dataOut := new(sqlSchema)
+	dataOut.NodeID = query.Get("nodeid")
+	dataOut.MetadataName = query.Get("metadata_name")
+	dataOut.MetadataValue = query.Get("metadata_value")
+	lonStr := query.Get("lon")
+	latStr := query.Get("lat")
+	lon, err := strconv.ParseFloat(lonStr, 64)
+	if err != nil {
+		err = fmt.Errorf("Error converting string to float: %v", err)
+		return
+	}
+	lat, err := strconv.ParseFloat(latStr, 64)
+	if err != nil {
+		err = fmt.Errorf("Error converting string to float: %v", err)
+		return
+	}
+	dataOut.Geom = *geo.NewPoint(lat, lon)
+
+	insertQueryStr := "INSERT INTO Nodes (nodeid, metadata_name, metadata_value, geom) VALUES ( ?, ?, ?, ST_GeomFromText( ? , 4326))  ;"
+	insForm, err := db.Prepare(insertQueryStr)
+	if err != nil {
+		err = fmt.Errorf("Node insertion prepare in mysql failed: %s", err.Error())
+		return
+	}
+	insForm.Exec(dataOut.NodeID, dataOut.MetadataName, dataOut.MetadataValue, dataOut.Geom.ToWKT())
+	log.Println("POST(INSERT): ")
+	log.Printf("nodeID : %s", dataOut.NodeID)
+	log.Printf("metadataName : %s", dataOut.MetadataName)
+	log.Printf("metadataValue : %s", dataOut.MetadataValue)
+	log.Printf("geom : %s", dataOut.Geom.ToWKT())
+	log.Printf("\n")
+
 	respondJSON(w, http.StatusOK, dataOut)
 	return
 }

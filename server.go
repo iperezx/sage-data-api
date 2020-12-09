@@ -82,6 +82,12 @@ func createRouter() {
 		negroni.Wrap(http.HandlerFunc(getSageNodes)),
 	)).Methods(http.MethodGet)
 
+	// POST /node
+	api.Handle("/node", negroni.New(
+		negroni.HandlerFunc(authMW),
+		negroni.Wrap(http.HandlerFunc(postSageNodes)),
+	)).Methods(http.MethodPost)
+
 	log.Fatalln(http.ListenAndServe(":8080", api))
 
 }
