@@ -71,12 +71,12 @@ func createRouter() {
 	r := mainRouter
 	log.Println("Sage Node API")
 	api := r.PathPrefix("/api/v1").Subrouter()
+
 	api.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Welcome to SAGE Node API")
 	})
 
-	// - list buckets
-	// GET /objects/
+	// GET /nodes
 	api.Handle("/nodes", negroni.New(
 		negroni.HandlerFunc(authMW),
 		negroni.Wrap(http.HandlerFunc(getSageNodes)),

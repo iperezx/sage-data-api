@@ -12,10 +12,10 @@ import (
 )
 
 type sqlSchema struct {
-	nodeID        int
-	metadataName  string
-	metadataValue string
-	geom          geo.Point
+	NodeID        string    `json:"nodeID,omitempty"`
+	MetadataName  string    `json:"metadataName,omitempty"`
+	MetadataValue string    `json:"metadataValue,omitempty"`
+	Geom          geo.Point `json:"geom,omitempty"`
 }
 
 func getSageNodes(w http.ResponseWriter, r *http.Request) {
@@ -26,17 +26,24 @@ func getSageNodes(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 	queryStr := "SELECT * FROM Nodes ;"
-	data, err := db.Query(queryStr)
+	stmt, err := db.Prepare(queryStr)
+
+	if err != nil {
+		err = fmt.Errorf("DB Prepare Error: %v", err)
+		return
+	}
+
+	data, err := stmt.Query()
 
 	if err != nil {
 		err = fmt.Errorf("Query Error: %v", err)
 		return
 	}
-	dataOut := []sqlSchema{}
-	for data.Next() {
-		row := sqlSchema{}
 
-		err = data.Scan(&row.nodeID, &row.metadataName, &row.metadataValue, &row.geom)
+	dataOut := []*sqlSchema{}
+	for data.Next() {
+		row := new(sqlSchema)
+		err = data.Scan(&row.NodeID, &row.MetadataName, &row.MetadataValue, &row.Geom)
 		if err != nil {
 			err = fmt.Errorf("Error with parsing row: %v", err)
 			return
