@@ -28,7 +28,6 @@ func init() {
 	mysqlUsername = os.Getenv("MYSQL_USER")
 	mysqlPassword = os.Getenv("MYSQL_PASSWORD")
 
-	// example: "root:password1@tcp(127.0.0.1:3306)/test"
 	mysqlDSN = fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", mysqlUsername, mysqlPassword, mysqlHost, mysqlDatabase)
 
 	log.Printf("mysqlHost: %s", mysqlHost)
