@@ -25,3 +25,16 @@ The command deploys the node API on Nautilus.
 
 User side
 -------------
+There are only two operations supported:
+- Get all the current nodes
+- Post a new node
+
+Get all the nodes:
+```bash
+curl GET 'http://localhost:8080/api/v1/nodes'
+```
+
+Add a new node:
+```bash
+curl --location --request POST 'http://localhost:8080/api/v1/node?nodeid=4cd98fc67b75&metadata_name=NodeName&metadata_value=Sage-NEON-02&lat=40.01631&lon=-105.24585'
+```

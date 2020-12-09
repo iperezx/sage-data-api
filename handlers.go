@@ -12,7 +12,7 @@ import (
 	geo "github.com/paulmach/go.geo"
 )
 
-type sqlSchema struct {
+type sageNode struct {
 	NodeID        string    `json:"nodeID,omitempty"`
 	MetadataName  string    `json:"metadataName,omitempty"`
 	MetadataValue string    `json:"metadataValue,omitempty"`
@@ -41,9 +41,9 @@ func getSageNodes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dataOut := []*sqlSchema{}
+	dataOut := []*sageNode{}
 	for data.Next() {
-		row := new(sqlSchema)
+		row := new(sageNode)
 		err = data.Scan(&row.NodeID, &row.MetadataName, &row.MetadataValue, &row.Geom)
 		if err != nil {
 			err = fmt.Errorf("Error with parsing row: %v", err)
@@ -59,14 +59,8 @@ func getSageNodes(w http.ResponseWriter, r *http.Request) {
 }
 
 func postSageNodes(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("mysql", mysqlDSN)
-	if err != nil {
-		err = fmt.Errorf("Unable to connect to database: %v", err)
-		return
-	}
-	defer db.Close()
 	query := r.URL.Query()
-	dataOut := new(sqlSchema)
+	dataOut := new(sageNode)
 	dataOut.NodeID = query.Get("nodeid")
 	dataOut.MetadataName = query.Get("metadata_name")
 	dataOut.MetadataValue = query.Get("metadata_value")
@@ -84,13 +78,8 @@ func postSageNodes(w http.ResponseWriter, r *http.Request) {
 	}
 	dataOut.Geom = *geo.NewPoint(lat, lon)
 
-	insertQueryStr := "INSERT INTO Nodes (nodeid, metadata_name, metadata_value, geom) VALUES ( ?, ?, ?, ST_GeomFromText( ? , 4326))  ;"
-	insForm, err := db.Prepare(insertQueryStr)
-	if err != nil {
-		err = fmt.Errorf("Node insertion prepare in mysql failed: %s", err.Error())
-		return
-	}
-	insForm.Exec(dataOut.NodeID, dataOut.MetadataName, dataOut.MetadataValue, dataOut.Geom.ToWKT())
+	insertNode(dataOut)
+
 	log.Println("POST(INSERT): ")
 	log.Printf("nodeID : %s", dataOut.NodeID)
 	log.Printf("metadataName : %s", dataOut.MetadataName)
@@ -99,6 +88,23 @@ func postSageNodes(w http.ResponseWriter, r *http.Request) {
 	log.Printf("\n")
 
 	respondJSON(w, http.StatusOK, dataOut)
+	return
+}
+
+func insertNode(node *sageNode) {
+	db, err := sql.Open("mysql", mysqlDSN)
+	if err != nil {
+		err = fmt.Errorf("Unable to connect to database: %v", err)
+		return
+	}
+	defer db.Close()
+	insertQueryStr := "INSERT INTO Nodes (nodeid, metadata_name, metadata_value, geom) VALUES ( ?, ?, ?, ST_GeomFromText( ? , 4326))  ;"
+	insForm, err := db.Prepare(insertQueryStr)
+	if err != nil {
+		err = fmt.Errorf("Node insertion prepare in mysql failed: %s", err.Error())
+		return
+	}
+	insForm.Exec(node.NodeID, node.MetadataName, node.MetadataValue, node.Geom.ToWKT())
 	return
 }
 
