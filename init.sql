@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS SageStorage.Nodes (
 );
 
 INSERT INTO SageStorage.Nodes (nodeid, metadata_name, metadata_value) VALUES 
-( '4cd98fc4d2a8' ,'NodeName','Sage-NEON-01');
+( '4cd98fc4d2a8' ,'name','Sage-NEON-01');
 

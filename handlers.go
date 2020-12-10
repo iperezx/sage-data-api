@@ -10,23 +10,31 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type sageNode struct {
+type nodeSchema struct {
 	NodeID        string `json:"nodeID,omitempty"`
 	MetadataName  string `json:"metadataName,omitempty"`
 	MetadataValue string `json:"metadataValue,omitempty"`
 }
 
+type nodeSage struct {
+	ID     string `json:"id,omitempty"`
+	Name   string `json:"name,omitempty"`
+	Status string `json:"status,omitempty"`
+	Lat    string `json:"lat,omitempty"`
+	Lon    string `json:"lon,omitempty"`
+}
+
 func getSageNodes(w http.ResponseWriter, r *http.Request) {
-	dataOut := []*sageNode{}
-	dataOut = getAllSageNodes()
+	data := []*nodeSage{}
+	data = getAllSageNodes()
 	log.Println("GET All Nodes")
-	respondJSON(w, http.StatusOK, dataOut)
+	respondJSON(w, http.StatusOK, data)
 	return
 }
 
 func postSageNodes(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
-	dataOut := new(sageNode)
+	dataOut := new(nodeSchema)
 	dataOut.NodeID = query.Get("nodeid")
 	dataOut.MetadataName = query.Get("metadata_name")
 	dataOut.MetadataValue = query.Get("metadata_value")
@@ -43,14 +51,14 @@ func postSageNodes(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func getAllSageNodes() []*sageNode {
+func getSageNode(nodeID string) []*nodeSchema {
 	db, err := sql.Open("mysql", mysqlDSN)
 	if err != nil {
 		err = fmt.Errorf("Unable to connect to database: %v", err)
 		return nil
 	}
 	defer db.Close()
-	queryStr := "SELECT * FROM Nodes ;"
+	queryStr := "SELECT * FROM Nodes where nodeid=? ;"
 	stmt, err := db.Prepare(queryStr)
 
 	if err != nil {
@@ -58,17 +66,16 @@ func getAllSageNodes() []*sageNode {
 		return nil
 	}
 
-	data, err := stmt.Query()
+	nodeData, err := stmt.Query(nodeID)
 
 	if err != nil {
 		err = fmt.Errorf("Query Error: %v", err)
 		return nil
 	}
-
-	dataOut := []*sageNode{}
-	for data.Next() {
-		row := new(sageNode)
-		err = data.Scan(&row.NodeID, &row.MetadataName, &row.MetadataValue)
+	dataOut := []*nodeSchema{}
+	for nodeData.Next() {
+		row := new(nodeSchema)
+		err = nodeData.Scan(&row.NodeID, &row.MetadataName, &row.MetadataValue)
 		if err != nil {
 			err = fmt.Errorf("Error with parsing row: %v", err)
 			return nil
@@ -78,7 +85,67 @@ func getAllSageNodes() []*sageNode {
 	return dataOut
 }
 
-func insertNode(node *sageNode) {
+func getAllSageNodes() []*nodeSage {
+	db, err := sql.Open("mysql", mysqlDSN)
+	if err != nil {
+		err = fmt.Errorf("Unable to connect to database: %v", err)
+		return nil
+	}
+	defer db.Close()
+	queryStr := "SELECT DISTINCT(nodeid) FROM Nodes ;"
+	stmt, err := db.Prepare(queryStr)
+
+	if err != nil {
+		err = fmt.Errorf("DB Prepare Error: %v", err)
+		return nil
+	}
+
+	nodeIDs, err := stmt.Query()
+
+	if err != nil {
+		err = fmt.Errorf("Query Error: %v", err)
+		return nil
+	}
+
+	dataOut := []*nodeSage{}
+	dataOut = getNodeIDRecords(nodeIDs)
+	return dataOut
+}
+
+func getNodeIDRecords(nodeIDs *sql.Rows) []*nodeSage {
+	dataOut := []*nodeSage{}
+	for nodeIDs.Next() {
+		var nodeID string
+		err := nodeIDs.Scan(&nodeID)
+		if err != nil {
+			err = fmt.Errorf("Error with parsing row: %v", err)
+			return nil
+		}
+
+		var nodeData []*nodeSchema
+		nodeData = getSageNode(nodeID)
+		nodeOut := new(nodeSage)
+		for _, node := range nodeData {
+			nodeOut.ID = node.NodeID
+			if node.MetadataName == "name" {
+				nodeOut.Name = node.MetadataValue
+			}
+			if node.MetadataName == "status" {
+				nodeOut.Status = node.MetadataValue
+			}
+			if node.MetadataName == "lat" {
+				nodeOut.Lat = node.MetadataValue
+			}
+			if node.MetadataName == "lon" {
+				nodeOut.Lon = node.MetadataValue
+			}
+		}
+		dataOut = append(dataOut, nodeOut)
+	}
+	return dataOut
+}
+
+func insertNode(node *nodeSchema) {
 	db, err := sql.Open("mysql", mysqlDSN)
 	if err != nil {
 		err = fmt.Errorf("Unable to connect to database: %v", err)
