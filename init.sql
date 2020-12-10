@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS SageStorage.Nodes (
-    nodeid          VARCHAR(64) NOT NULL PRIMARY KEY,
+    nodeid          VARCHAR(64) NOT NULL,
     metadata_name   VARCHAR(64),
     metadata_value  VARCHAR(64),
     geom            point srid 4326

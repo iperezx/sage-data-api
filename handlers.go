@@ -20,40 +20,9 @@ type sageNode struct {
 }
 
 func getSageNodes(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("mysql", mysqlDSN)
-	if err != nil {
-		err = fmt.Errorf("Unable to connect to database: %v", err)
-		return
-	}
-	defer db.Close()
-	queryStr := "SELECT * FROM Nodes ;"
-	stmt, err := db.Prepare(queryStr)
-
-	if err != nil {
-		err = fmt.Errorf("DB Prepare Error: %v", err)
-		return
-	}
-
-	data, err := stmt.Query()
-
-	if err != nil {
-		err = fmt.Errorf("Query Error: %v", err)
-		return
-	}
-
 	dataOut := []*sageNode{}
-	for data.Next() {
-		row := new(sageNode)
-		err = data.Scan(&row.NodeID, &row.MetadataName, &row.MetadataValue, &row.Geom)
-		if err != nil {
-			err = fmt.Errorf("Error with parsing row: %v", err)
-			return
-		}
-		dataOut = append(dataOut, row)
-	}
-
-	log.Printf("GetSageNodes, queryStr: %s", queryStr)
-	log.Printf("\n")
+	dataOut = getAllSageNodes()
+	log.Println("GET All Nodes")
 	respondJSON(w, http.StatusOK, dataOut)
 	return
 }
@@ -77,7 +46,6 @@ func postSageNodes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	dataOut.Geom = *geo.NewPoint(lat, lon)
-
 	insertNode(dataOut)
 
 	log.Println("POST(INSERT): ")
@@ -89,6 +57,41 @@ func postSageNodes(w http.ResponseWriter, r *http.Request) {
 
 	respondJSON(w, http.StatusOK, dataOut)
 	return
+}
+
+func getAllSageNodes() []*sageNode {
+	db, err := sql.Open("mysql", mysqlDSN)
+	if err != nil {
+		err = fmt.Errorf("Unable to connect to database: %v", err)
+		return nil
+	}
+	defer db.Close()
+	queryStr := "SELECT * FROM Nodes ;"
+	stmt, err := db.Prepare(queryStr)
+
+	if err != nil {
+		err = fmt.Errorf("DB Prepare Error: %v", err)
+		return nil
+	}
+
+	data, err := stmt.Query()
+
+	if err != nil {
+		err = fmt.Errorf("Query Error: %v", err)
+		return nil
+	}
+
+	dataOut := []*sageNode{}
+	for data.Next() {
+		row := new(sageNode)
+		err = data.Scan(&row.NodeID, &row.MetadataName, &row.MetadataValue, &row.Geom)
+		if err != nil {
+			err = fmt.Errorf("Error with parsing row: %v", err)
+			return nil
+		}
+		dataOut = append(dataOut, row)
+	}
+	return dataOut
 }
 
 func insertNode(node *sageNode) {
