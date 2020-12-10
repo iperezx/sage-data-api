@@ -25,9 +25,7 @@ The command deploys the node API on Nautilus.
 
 User side
 -------------
-There are only two operations supported:
-- Get all the nodes
-
+The API reads a csv file (`manifest.csv`) and outputs the content in a json format to the user.
 Get all the nodes:
 ```bash
 curl GET 'http://localhost:8080/api/v1/nodes'
@@ -38,7 +36,15 @@ Returns:
 [
     {
         "id": "4cd98fc4d2a8",
-        "name": "Sage-NEON-01"
-    }
+        "name": "Sage-NEON-01",
+        "status": "Up",
+        "OSVersion": "dell-1.0.0.local-6da62a8",
+        "serviceTag": "79BBZ23",
+        "SpecialDevices": "N/A",
+        "BiosVersion": "2.8.2",
+        "lat": "40.01631",
+        "lon": "-105.24585"
+    },
+    ...
 ]
 ```

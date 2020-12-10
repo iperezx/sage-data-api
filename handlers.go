@@ -1,129 +1,74 @@
 package main
 
 import (
-	"database/sql"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type nodeSchema struct {
-	NodeID        string `json:"nodeID,omitempty"`
-	MetadataName  string `json:"metadataName,omitempty"`
-	MetadataValue string `json:"metadataValue,omitempty"`
-}
-
 type nodeSage struct {
-	ID     string `json:"id,omitempty"`
-	Name   string `json:"name,omitempty"`
-	Status string `json:"status,omitempty"`
-	Lat    string `json:"lat,omitempty"`
-	Lon    string `json:"lon,omitempty"`
+	ID             string `json:"id,omitempty"`
+	Name           string `json:"name,omitempty"`
+	Status         string `json:"status,omitempty"`
+	ProvisionDate  string `json:"provisionDate,omitempty"`
+	OSVersion      string `json:"OSVersion,omitempty"`
+	ServiceTag     string `json:"serviceTag,omitempty"`
+	SpecialDevices string `json:"SpecialDevices,omitempty"`
+	BiosVersion    string `json:"BiosVersion,omitempty"`
+	Lat            string `json:"lat,omitempty"`
+	Lon            string `json:"lon,omitempty"`
 }
 
 func getSageNodes(w http.ResponseWriter, r *http.Request) {
-	data := []*nodeSage{}
-	data = getAllSageNodes()
+	data := getNodeDataFromCSV(csvFile)
 	log.Println("GET All Nodes")
 	respondJSON(w, http.StatusOK, data)
 	return
 }
 
-func getAllSageNodes() []*nodeSage {
-	db, err := sql.Open("mysql", mysqlDSN)
+func getNodeDataFromCSV(csvFile string) []*nodeSage {
+	csv_file, err := os.Open(csvFile)
 	if err != nil {
-		err = fmt.Errorf("Unable to connect to database: %v", err)
+		err = fmt.Errorf("Error with opening csv: %v", err)
 		return nil
 	}
-	defer db.Close()
-	queryStr := "SELECT DISTINCT(nodeid) FROM Nodes ;"
-	stmt, err := db.Prepare(queryStr)
+	defer csv_file.Close()
 
+	r := csv.NewReader(csv_file)
+	records, err := r.ReadAll()
 	if err != nil {
-		err = fmt.Errorf("DB Prepare Error: %v", err)
+		err = fmt.Errorf("Error with reading all data: %v", err)
 		return nil
 	}
-
-	nodeIDs, err := stmt.Query()
-
-	if err != nil {
-		err = fmt.Errorf("Query Error: %v", err)
-		return nil
+	header := make([]string, 0)
+	for _, headerContent := range records[0] {
+		header = append(header, headerContent)
 	}
-
-	dataOut := []*nodeSage{}
-	dataOut = getNodeIDRecords(nodeIDs)
-	return dataOut
-}
-
-func getNodeIDRecords(nodeIDs *sql.Rows) []*nodeSage {
-	dataOut := []*nodeSage{}
-	for nodeIDs.Next() {
-		var nodeID string
-		err := nodeIDs.Scan(&nodeID)
-		if err != nil {
-			err = fmt.Errorf("Error with parsing row: %v", err)
-			return nil
-		}
-
-		var nodeData []*nodeSchema
-		nodeData = getSageNodeByNodeID(nodeID)
-		nodeOut := new(nodeSage)
-		for _, node := range nodeData {
-			nodeOut.ID = node.NodeID
-			if node.MetadataName == "name" {
-				nodeOut.Name = node.MetadataValue
-			}
-			if node.MetadataName == "status" {
-				nodeOut.Status = node.MetadataValue
-			}
-			if node.MetadataName == "lat" {
-				nodeOut.Lat = node.MetadataValue
-			}
-			if node.MetadataName == "lon" {
-				nodeOut.Lon = node.MetadataValue
-			}
-		}
-		dataOut = append(dataOut, nodeOut)
+	indexMap := map[string]int{"ID": 0, "Name": 1, "Status": 2, "ProvisionDate": 3,
+		"OSVersion": 4, "ServiceTag": 5, "SpecialDevices": 6,
+		"BiosVersion": 7, "Lat": 8, "Lon": 9}
+	records = records[1:]
+	nodes := []*nodeSage{}
+	for _, rec := range records {
+		node := new(nodeSage)
+		node.ID = rec[indexMap["ID"]]
+		node.Name = rec[indexMap["Name"]]
+		node.Status = rec[indexMap["Status"]]
+		node.Status = rec[indexMap["Status"]]
+		node.OSVersion = rec[indexMap["OSVersion"]]
+		node.ServiceTag = rec[indexMap["ServiceTag"]]
+		node.SpecialDevices = rec[indexMap["SpecialDevices"]]
+		node.BiosVersion = rec[indexMap["BiosVersion"]]
+		node.Lat = rec[indexMap["Lat"]]
+		node.Lon = rec[indexMap["Lon"]]
+		nodes = append(nodes, node)
 	}
-	return dataOut
-}
-
-func getSageNodeByNodeID(nodeID string) []*nodeSchema {
-	db, err := sql.Open("mysql", mysqlDSN)
-	if err != nil {
-		err = fmt.Errorf("Unable to connect to database: %v", err)
-		return nil
-	}
-	defer db.Close()
-	queryStr := "SELECT * FROM Nodes where nodeid=? ;"
-	stmt, err := db.Prepare(queryStr)
-
-	if err != nil {
-		err = fmt.Errorf("DB Prepare Error: %v", err)
-		return nil
-	}
-
-	nodeData, err := stmt.Query(nodeID)
-
-	if err != nil {
-		err = fmt.Errorf("Query Error: %v", err)
-		return nil
-	}
-	dataOut := []*nodeSchema{}
-	for nodeData.Next() {
-		row := new(nodeSchema)
-		err = nodeData.Scan(&row.NodeID, &row.MetadataName, &row.MetadataValue)
-		if err != nil {
-			err = fmt.Errorf("Error with parsing row: %v", err)
-			return nil
-		}
-		dataOut = append(dataOut, row)
-	}
-	return dataOut
+	return nodes
 }
 
 func authMW(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
