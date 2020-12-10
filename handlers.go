@@ -32,59 +32,6 @@ func getSageNodes(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func postSageNodes(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	dataOut := new(nodeSchema)
-	dataOut.NodeID = query.Get("nodeid")
-	dataOut.MetadataName = query.Get("metadata_name")
-	dataOut.MetadataValue = query.Get("metadata_value")
-
-	insertNode(dataOut)
-
-	log.Println("POST(INSERT): ")
-	log.Printf("nodeID : %s", dataOut.NodeID)
-	log.Printf("metadataName : %s", dataOut.MetadataName)
-	log.Printf("metadataValue : %s", dataOut.MetadataValue)
-	log.Println()
-
-	respondJSON(w, http.StatusOK, dataOut)
-	return
-}
-
-func getSageNode(nodeID string) []*nodeSchema {
-	db, err := sql.Open("mysql", mysqlDSN)
-	if err != nil {
-		err = fmt.Errorf("Unable to connect to database: %v", err)
-		return nil
-	}
-	defer db.Close()
-	queryStr := "SELECT * FROM Nodes where nodeid=? ;"
-	stmt, err := db.Prepare(queryStr)
-
-	if err != nil {
-		err = fmt.Errorf("DB Prepare Error: %v", err)
-		return nil
-	}
-
-	nodeData, err := stmt.Query(nodeID)
-
-	if err != nil {
-		err = fmt.Errorf("Query Error: %v", err)
-		return nil
-	}
-	dataOut := []*nodeSchema{}
-	for nodeData.Next() {
-		row := new(nodeSchema)
-		err = nodeData.Scan(&row.NodeID, &row.MetadataName, &row.MetadataValue)
-		if err != nil {
-			err = fmt.Errorf("Error with parsing row: %v", err)
-			return nil
-		}
-		dataOut = append(dataOut, row)
-	}
-	return dataOut
-}
-
 func getAllSageNodes() []*nodeSage {
 	db, err := sql.Open("mysql", mysqlDSN)
 	if err != nil {
@@ -123,7 +70,7 @@ func getNodeIDRecords(nodeIDs *sql.Rows) []*nodeSage {
 		}
 
 		var nodeData []*nodeSchema
-		nodeData = getSageNode(nodeID)
+		nodeData = getSageNodeByNodeID(nodeID)
 		nodeOut := new(nodeSage)
 		for _, node := range nodeData {
 			nodeOut.ID = node.NodeID
@@ -145,21 +92,38 @@ func getNodeIDRecords(nodeIDs *sql.Rows) []*nodeSage {
 	return dataOut
 }
 
-func insertNode(node *nodeSchema) {
+func getSageNodeByNodeID(nodeID string) []*nodeSchema {
 	db, err := sql.Open("mysql", mysqlDSN)
 	if err != nil {
 		err = fmt.Errorf("Unable to connect to database: %v", err)
-		return
+		return nil
 	}
 	defer db.Close()
-	insertQueryStr := "INSERT INTO Nodes (nodeid, metadata_name, metadata_value) VALUES ( ?, ?, ?)  ;"
-	insForm, err := db.Prepare(insertQueryStr)
+	queryStr := "SELECT * FROM Nodes where nodeid=? ;"
+	stmt, err := db.Prepare(queryStr)
+
 	if err != nil {
-		err = fmt.Errorf("Node insertion prepare in mysql failed: %s", err.Error())
-		return
+		err = fmt.Errorf("DB Prepare Error: %v", err)
+		return nil
 	}
-	insForm.Exec(node.NodeID, node.MetadataName, node.MetadataValue)
-	return
+
+	nodeData, err := stmt.Query(nodeID)
+
+	if err != nil {
+		err = fmt.Errorf("Query Error: %v", err)
+		return nil
+	}
+	dataOut := []*nodeSchema{}
+	for nodeData.Next() {
+		row := new(nodeSchema)
+		err = nodeData.Scan(&row.NodeID, &row.MetadataName, &row.MetadataValue)
+		if err != nil {
+			err = fmt.Errorf("Error with parsing row: %v", err)
+			return nil
+		}
+		dataOut = append(dataOut, row)
+	}
+	return dataOut
 }
 
 func authMW(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
