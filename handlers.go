@@ -6,17 +6,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
-	geo "github.com/paulmach/go.geo"
 )
 
 type sageNode struct {
-	NodeID        string    `json:"nodeID,omitempty"`
-	MetadataName  string    `json:"metadataName,omitempty"`
-	MetadataValue string    `json:"metadataValue,omitempty"`
-	Geom          geo.Point `json:"geom,omitempty"`
+	NodeID        string `json:"nodeID,omitempty"`
+	MetadataName  string `json:"metadataName,omitempty"`
+	MetadataValue string `json:"metadataValue,omitempty"`
 }
 
 func getSageNodes(w http.ResponseWriter, r *http.Request) {
@@ -33,27 +30,14 @@ func postSageNodes(w http.ResponseWriter, r *http.Request) {
 	dataOut.NodeID = query.Get("nodeid")
 	dataOut.MetadataName = query.Get("metadata_name")
 	dataOut.MetadataValue = query.Get("metadata_value")
-	lonStr := query.Get("lon")
-	latStr := query.Get("lat")
-	lon, err := strconv.ParseFloat(lonStr, 64)
-	if err != nil {
-		err = fmt.Errorf("Error converting string to float: %v", err)
-		return
-	}
-	lat, err := strconv.ParseFloat(latStr, 64)
-	if err != nil {
-		err = fmt.Errorf("Error converting string to float: %v", err)
-		return
-	}
-	dataOut.Geom = *geo.NewPoint(lat, lon)
+
 	insertNode(dataOut)
 
 	log.Println("POST(INSERT): ")
 	log.Printf("nodeID : %s", dataOut.NodeID)
 	log.Printf("metadataName : %s", dataOut.MetadataName)
 	log.Printf("metadataValue : %s", dataOut.MetadataValue)
-	log.Printf("geom : %s", dataOut.Geom.ToWKT())
-	log.Printf("\n")
+	log.Println()
 
 	respondJSON(w, http.StatusOK, dataOut)
 	return
@@ -84,7 +68,7 @@ func getAllSageNodes() []*sageNode {
 	dataOut := []*sageNode{}
 	for data.Next() {
 		row := new(sageNode)
-		err = data.Scan(&row.NodeID, &row.MetadataName, &row.MetadataValue, &row.Geom)
+		err = data.Scan(&row.NodeID, &row.MetadataName, &row.MetadataValue)
 		if err != nil {
 			err = fmt.Errorf("Error with parsing row: %v", err)
 			return nil
@@ -101,13 +85,13 @@ func insertNode(node *sageNode) {
 		return
 	}
 	defer db.Close()
-	insertQueryStr := "INSERT INTO Nodes (nodeid, metadata_name, metadata_value, geom) VALUES ( ?, ?, ?, ST_GeomFromText( ? , 4326))  ;"
+	insertQueryStr := "INSERT INTO Nodes (nodeid, metadata_name, metadata_value) VALUES ( ?, ?, ?)  ;"
 	insForm, err := db.Prepare(insertQueryStr)
 	if err != nil {
 		err = fmt.Errorf("Node insertion prepare in mysql failed: %s", err.Error())
 		return
 	}
-	insForm.Exec(node.NodeID, node.MetadataName, node.MetadataValue, node.Geom.ToWKT())
+	insForm.Exec(node.NodeID, node.MetadataName, node.MetadataValue)
 	return
 }
 
