@@ -7,8 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 type nodeSage struct {
@@ -49,9 +47,10 @@ func getNodeDataFromCSV(csvFile string) []*nodeSage {
 	for _, headerContent := range records[0] {
 		header = append(header, headerContent)
 	}
-	indexMap := map[string]int{"ID": 0, "Name": 1, "Status": 2, "ProvisionDate": 3,
-		"OSVersion": 4, "ServiceTag": 5, "SpecialDevices": 6,
-		"BiosVersion": 7, "Lat": 8, "Lon": 9}
+	indexMap := map[string]int{}
+	for i, name := range header {
+		indexMap[name] = i
+	}
 	records = records[1:]
 	nodes := []*nodeSage{}
 	for _, rec := range records {
@@ -59,7 +58,7 @@ func getNodeDataFromCSV(csvFile string) []*nodeSage {
 		node.ID = rec[indexMap["ID"]]
 		node.Name = rec[indexMap["Name"]]
 		node.Status = rec[indexMap["Status"]]
-		node.Status = rec[indexMap["Status"]]
+		node.ProvisionDate = rec[indexMap["ProvisionDate"]]
 		node.OSVersion = rec[indexMap["OSVersion"]]
 		node.ServiceTag = rec[indexMap["ServiceTag"]]
 		node.SpecialDevices = rec[indexMap["SpecialDevices"]]
