@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -20,6 +21,17 @@ type nodeSage struct {
 	BiosVersion    string `json:"BiosVersion,omitempty"`
 	Lat            string `json:"lat,omitempty"`
 	Lon            string `json:"lon,omitempty"`
+}
+
+type dataDict struct {
+	ID   string `json:"id,omitempty"`
+	Type string `json:"type,omitempty"`
+	Info info   `json:"info,omitempty"`
+}
+
+type info struct {
+	Label string `json:"label,omitempty"`
+	Notes string `json:"notes,omitempty"`
 }
 
 func getSageNodes(w http.ResponseWriter, r *http.Request) {
@@ -68,6 +80,24 @@ func getNodeDataFromCSV(csvFile string) []*nodeSage {
 		nodes = append(nodes, node)
 	}
 	return nodes
+}
+
+func getSageNodesDataDict(w http.ResponseWriter, r *http.Request) {
+	data := getNodeDataDictFromJson(jsonFile)
+	log.Println("GET All Nodes Data Dictionary")
+	respondJSON(w, http.StatusOK, data)
+	return
+}
+
+func getNodeDataDictFromJson(jsonFile string) []*dataDict {
+	jsonData, err := os.Open(jsonFile)
+	if err != nil {
+		fmt.Println(err)
+	}
+	byteValue, _ := ioutil.ReadAll(jsonData)
+	data := []*dataDict{}
+	json.Unmarshal(byteValue, &data)
+	return data
 }
 
 func authMW(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {

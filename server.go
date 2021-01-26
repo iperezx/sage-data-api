@@ -17,10 +17,12 @@ var (
 	mysqlDSN      string // Data Source Name
 	mainRouter    *mux.Router
 	csvFile       string
+	jsonFile      string
 )
 
 func init() {
 	csvFile = "manifest.csv"
+	jsonFile = "dataDict.json"
 }
 
 func createRouter() {
@@ -35,9 +37,14 @@ func createRouter() {
 	})
 
 	// GET /nodes
-	api.Handle("/nodes", negroni.New(
+	api.Handle("/nodes-data", negroni.New(
 		negroni.HandlerFunc(authMW),
 		negroni.Wrap(http.HandlerFunc(getSageNodes)),
+	)).Methods(http.MethodGet)
+
+	api.Handle("/nodes-datadict", negroni.New(
+		negroni.HandlerFunc(authMW),
+		negroni.Wrap(http.HandlerFunc(getSageNodesDataDict)),
 	)).Methods(http.MethodGet)
 
 	log.Fatalln(http.ListenAndServe(":8080", api))
