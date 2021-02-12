@@ -11,8 +11,8 @@ import (
 )
 
 type nodeSage struct {
-	ID             string `json:"id,omitempty"`
 	Name           string `json:"name,omitempty"`
+	ID             string `json:"id,omitempty"`
 	Status         string `json:"status,omitempty"`
 	ProvisionDate  string `json:"provisionDate,omitempty"`
 	OSVersion      string `json:"OSVersion,omitempty"`
@@ -67,14 +67,14 @@ func getNodeDataFromCSV(csvFile string) []*nodeSage {
 	nodes := []*nodeSage{}
 	for _, rec := range records {
 		node := new(nodeSage)
-		node.ID = rec[indexMap["id"]]
 		node.Name = rec[indexMap["name"]]
+		node.ID = rec[indexMap["id"]]
 		node.Status = rec[indexMap["status"]]
 		node.ProvisionDate = rec[indexMap["provisionDate"]]
 		node.OSVersion = rec[indexMap["OSVersion"]]
 		node.ServiceTag = rec[indexMap["ServiceTag"]]
 		node.SpecialDevices = rec[indexMap["SpecialDevices"]]
-		node.BiosVersion = rec[indexMap["BiosVersion"]]
+		node.BiosVersion = rec[indexMap["BIOSVersion"]]
 		node.Lat = rec[indexMap["Lat"]]
 		node.Lon = rec[indexMap["Lon"]]
 		nodes = append(nodes, node)
