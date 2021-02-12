@@ -67,10 +67,10 @@ func getNodeDataFromCSV(csvFile string) []*nodeSage {
 	nodes := []*nodeSage{}
 	for _, rec := range records {
 		node := new(nodeSage)
-		node.ID = rec[indexMap["ID"]]
-		node.Name = rec[indexMap["Name"]]
-		node.Status = rec[indexMap["Status"]]
-		node.ProvisionDate = rec[indexMap["ProvisionDate"]]
+		node.ID = rec[indexMap["id"]]
+		node.Name = rec[indexMap["name"]]
+		node.Status = rec[indexMap["status"]]
+		node.ProvisionDate = rec[indexMap["provisionDate"]]
 		node.OSVersion = rec[indexMap["OSVersion"]]
 		node.ServiceTag = rec[indexMap["ServiceTag"]]
 		node.SpecialDevices = rec[indexMap["SpecialDevices"]]
