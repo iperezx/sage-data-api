@@ -42,9 +42,14 @@ func createRouter() {
 		negroni.Wrap(http.HandlerFunc(getSageNodes)),
 	)).Methods(http.MethodGet)
 
-	api.Handle("/nodes-datadict", negroni.New(
+	api.Handle("/nodes-metadata", negroni.New(
 		negroni.HandlerFunc(authMW),
-		negroni.Wrap(http.HandlerFunc(getSageNodesDataDict)),
+		negroni.Wrap(http.HandlerFunc(getSageNodesMetadata)),
+	)).Methods(http.MethodGet)
+
+	api.Handle("/nodes-all", negroni.New(
+		negroni.HandlerFunc(authMW),
+		negroni.Wrap(http.HandlerFunc(getSageNodesAndDataDict)),
 	)).Methods(http.MethodGet)
 
 	log.Fatalln(http.ListenAndServe(":8080", api))

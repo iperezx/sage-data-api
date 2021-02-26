@@ -23,20 +23,21 @@ type nodeSage struct {
 	Lon            string `json:"lon,omitempty"`
 }
 
-type dataDict struct {
-	ID   string `json:"id,omitempty"`
-	Type string `json:"type,omitempty"`
-	Info info   `json:"info,omitempty"`
+type metadata struct {
+	ID          string `json:"id,omitempty"`
+	Type        string `json:"type,omitempty"`
+	Label       string `json:"label,omitempty"`
+	Description string `json:"description,omitempty"`
 }
 
-type info struct {
-	Label string `json:"label,omitempty"`
-	Notes string `json:"notes,omitempty"`
+type data struct {
+	Data     []*nodeSage `json:"data,omitempty"`
+	Metadata []*metadata `json:"metadata,omitempty"`
 }
 
 func getSageNodes(w http.ResponseWriter, r *http.Request) {
 	data := getNodeDataFromCSV(csvFile)
-	log.Println("GET All Nodes")
+	log.Println("GET: All nodes data")
 	respondJSON(w, http.StatusOK, data)
 	return
 }
@@ -82,22 +83,33 @@ func getNodeDataFromCSV(csvFile string) []*nodeSage {
 	return nodes
 }
 
-func getSageNodesDataDict(w http.ResponseWriter, r *http.Request) {
-	data := getNodeDataDictFromJson(jsonFile)
-	log.Println("GET All Nodes Data Dictionary")
+func getSageNodesMetadata(w http.ResponseWriter, r *http.Request) {
+	data := getNodeMetadataFromJson(jsonFile)
+	log.Println("GET: All nodes metadata")
 	respondJSON(w, http.StatusOK, data)
 	return
 }
 
-func getNodeDataDictFromJson(jsonFile string) []*dataDict {
+func getNodeMetadataFromJson(jsonFile string) []*metadata {
 	jsonData, err := os.Open(jsonFile)
 	if err != nil {
 		fmt.Println(err)
 	}
 	byteValue, _ := ioutil.ReadAll(jsonData)
-	data := []*dataDict{}
+	data := []*metadata{}
 	json.Unmarshal(byteValue, &data)
 	return data
+}
+
+func getSageNodesAndDataDict(w http.ResponseWriter, r *http.Request) {
+	nodeData := getNodeDataFromCSV(csvFile)
+	metadata := getNodeMetadataFromJson(jsonFile)
+	var allData data
+	allData.Data = nodeData
+	allData.Metadata = metadata
+	log.Println("GET: All nodes data and metadata")
+	respondJSON(w, http.StatusOK, allData)
+	return
 }
 
 func authMW(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
