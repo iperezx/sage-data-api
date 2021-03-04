@@ -36,9 +36,11 @@ type data struct {
 }
 
 func getSageNodes(w http.ResponseWriter, r *http.Request) {
-	data := getNodeDataFromCSV(csvFile)
+	nodeData := getNodeDataFromCSV(csvFile)
+	var allData data
+	allData.Data = nodeData
 	log.Println("GET: All nodes data")
-	respondJSON(w, http.StatusOK, data)
+	respondJSON(w, http.StatusOK, allData)
 	return
 }
 
@@ -84,9 +86,11 @@ func getNodeDataFromCSV(csvFile string) []*nodeSage {
 }
 
 func getSageNodesMetadata(w http.ResponseWriter, r *http.Request) {
-	data := getNodeMetadataFromJson(jsonFile)
+	nodeMetadata := getNodeMetadataFromJson(jsonFile)
+	var allData data
+	allData.Metadata = nodeMetadata
 	log.Println("GET: All nodes metadata")
-	respondJSON(w, http.StatusOK, data)
+	respondJSON(w, http.StatusOK, allData)
 	return
 }
 

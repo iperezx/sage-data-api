@@ -33,17 +33,19 @@ curl GET 'http://localhost:8080/api/v1/nodes-data'
 
 Returns:
 ```bash
-[
+{
+  "data": [
     {
-        "id": "4cd98fc4d2a8",
-        "name": "Sage-NEON-01",
-        "status": "Up",
-        "OSVersion": "dell-1.0.0.local-6da62a8",
-        "serviceTag": "79BBZ23",
-        "SpecialDevices": "N/A",
-        "BiosVersion": "2.8.2",
-        "lat": "40.01631",
-        "lon": "-105.24585"
+      "name": "Sage-NEON-01",
+      "id": "4cd98fc4d2a8",
+      "status": "Up",
+      "provisionDate": "10/22/20",
+      "OSVersion": "dell-1.0.0.local-6da62a8",
+      "serviceTag": "79BBZ23",
+      "SpecialDevices": "N/A",
+      "BiosVersion": "2.8.2",
+      "lat": "40.01631",
+      "lon": "-105.24585"
     },
     ...
     {
@@ -58,7 +60,8 @@ Returns:
       "lat": "33.584306",
       "lon": "-101.871984"
     }
-]
+  ]
+}
 ```
 
 Get all the nodes metadata:
@@ -68,7 +71,8 @@ curl GET 'http://localhost:8080/api/v1/nodes-metadata'
 
 Returns:
 ```bash
-[
+{
+  "metadata": [
     {
       "id": "name",
       "type": "text",
@@ -82,7 +86,8 @@ Returns:
       "label": "Longitude",
       "description": "Longitude of Node."
     }
-]
+  ]
+}          
 ```
 
 Get all the nodes data and metadata:
@@ -92,7 +97,6 @@ curl GET 'http://localhost:8080/api/v1/nodes-all'
 
 Returns:
 ```bash
-[
 {
   "data": [
     {
