@@ -18,11 +18,13 @@ var (
 	mainRouter    *mux.Router
 	csvFile       string
 	jsonFile      string
+	pluginFile    string
 )
 
 func init() {
 	csvFile = "manifest.csv"
 	jsonFile = "dataDict.json"
+	pluginFile = "pluginData.json"
 }
 
 func createRouter() {
@@ -36,7 +38,8 @@ func createRouter() {
 		fmt.Fprintln(w, "Welcome to SAGE Node API")
 	})
 
-	// GET /nodes
+	// GET
+	// /nodes
 	api.Handle("/nodes-data", negroni.New(
 		negroni.HandlerFunc(authMW),
 		negroni.Wrap(http.HandlerFunc(getSageNodes)),
@@ -50,6 +53,12 @@ func createRouter() {
 	api.Handle("/nodes-all", negroni.New(
 		negroni.HandlerFunc(authMW),
 		negroni.Wrap(http.HandlerFunc(getSageNodesAndDataDict)),
+	)).Methods(http.MethodGet)
+
+	// /plugin
+	api.Handle("/plugin-data", negroni.New(
+		negroni.HandlerFunc(authMW),
+		negroni.Wrap(http.HandlerFunc(getSagePluginData)),
 	)).Methods(http.MethodGet)
 
 	log.Fatalln(http.ListenAndServe(":8080", api))

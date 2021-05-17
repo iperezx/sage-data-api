@@ -35,6 +35,25 @@ type data struct {
 	Metadata []*metadata `json:"metadata,omitempty"`
 }
 
+type pluginMetadata struct {
+	Node   string `json:"node,omitempty"`
+	Host   string `json:"host,omitempty"`
+	Plugin string `json:"plugin,omitempty"`
+	Camera string `json:"camera,omitempty"`
+}
+
+type pluginSage struct {
+	Timestamp string         `json:"timestamp,omitempty"`
+	Name      string         `json:"name,omitempty"`
+	Value     float64        `json:"value,omitempty"`
+	Metadata  pluginMetadata `json:"metadata,omitempty"`
+}
+
+type pluginData struct {
+	Data     []*pluginSage `json:"data,omitempty"`
+	Metadata []*metadata   `json:"metadata,omitempty"`
+}
+
 func getSageNodes(w http.ResponseWriter, r *http.Request) {
 	nodeData := getNodeDataFromCSV(csvFile)
 	var allData data
@@ -113,6 +132,28 @@ func getSageNodesAndDataDict(w http.ResponseWriter, r *http.Request) {
 	allData.Metadata = metadata
 	log.Println("GET: All nodes data and metadata")
 	respondJSON(w, http.StatusOK, allData)
+	return
+}
+
+//Plugin Data section
+
+func getPluginDataFromJson(jsonFile string) []*pluginSage {
+	jsonData, err := os.Open(jsonFile)
+	if err != nil {
+		fmt.Println(err)
+	}
+	byteValue, _ := ioutil.ReadAll(jsonData)
+	data := []*pluginSage{}
+	json.Unmarshal(byteValue, &data)
+	return data
+}
+
+func getSagePluginData(w http.ResponseWriter, r *http.Request) {
+	data := getPluginDataFromJson(pluginFile)
+	var sagePluginData pluginData
+	sagePluginData.Data = data
+	log.Println("GET: All plugin data")
+	respondJSON(w, http.StatusOK, sagePluginData)
 	return
 }
 
