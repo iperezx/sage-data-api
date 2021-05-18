@@ -50,8 +50,8 @@ type pluginSage struct {
 }
 
 type pluginData struct {
-	Data     []*pluginSage `json:"data,omitempty"`
-	Metadata []*metadata   `json:"metadata,omitempty"`
+	Data     []*pluginSage `json:"data"`
+	Metadata []*metadata   `json:"metadata"`
 }
 
 func getSageNodes(w http.ResponseWriter, r *http.Request) {
@@ -152,6 +152,7 @@ func getSagePluginData(w http.ResponseWriter, r *http.Request) {
 	data := getPluginDataFromJson(pluginFile)
 	var sagePluginData pluginData
 	sagePluginData.Data = data
+	sagePluginData.Metadata = []*metadata{}
 	log.Println("GET: All plugin data")
 	respondJSON(w, http.StatusOK, sagePluginData)
 	return
