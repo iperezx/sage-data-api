@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sage-node-api
+  name: sage-data-api
   namespace: sage
 spec:
   replicas: 1
   selector:
     matchLabels:
-      k8s-app: sage-node-api
+      k8s-app: sage-data-api
   template:
     metadata:
       labels:
-        k8s-app: sage-node-api
+        k8s-app: sage-data-api
     spec:
       containers:
-      - name: sage-node-api
-        image: iperezx/sage-nodes-api:latest     
+      - name: sage-data-api
+        image: iperezx/sage-data-api:latest     
         resources:
             limits:
               memory: 100Mi
@@ -33,12 +33,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: sage-node-api
+  name: sage-data-api
   labels:
-    service: sage-node-api
+    service: sage-data-api
 spec:
   selector:
-    k8s-app: sage-node-api
+    k8s-app: sage-data-api
   ports:
   - name: web
     port: 8080
@@ -48,17 +48,16 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: sage-node-api
+  name: sage-data-api
   namespace: sage
   annotations:
     traefik.ingress.kubernetes.io/router.tls: ""
 spec:
   rules:
-  - host: sage-node-api.nautilus.optiputer.net
+  - host: sage-data-api.nautilus.optiputer.net
     http:
       paths:
       - path: /
         backend:
-          serviceName: sage-node-api
+          serviceName: sage-data-api
           servicePort: 8080
-

@@ -10,15 +10,10 @@ import (
 )
 
 var (
-	mysqlHost     string
-	mysqlDatabase string
-	mysqlUsername string
-	mysqlPassword string
-	mysqlDSN      string // Data Source Name
-	mainRouter    *mux.Router
-	csvFile       string
-	jsonFile      string
-	pluginFile    string
+	mainRouter *mux.Router
+	csvFile    string
+	jsonFile   string
+	pluginFile string
 )
 
 func init() {
@@ -31,11 +26,11 @@ func createRouter() {
 
 	mainRouter = mux.NewRouter()
 	r := mainRouter
-	log.Println("Sage Node API")
+	log.Println("Sage Data API")
 	api := r.PathPrefix("/api/v1").Subrouter()
 
 	api.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Welcome to SAGE Node API")
+		fmt.Fprintln(w, "Welcome to SAGE Data API")
 	})
 
 	// GET

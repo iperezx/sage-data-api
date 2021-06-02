@@ -1,7 +1,7 @@
 version: '3.7'
 services:
-  sage-nodes-api:
-    image: iperezx/sage-nodes-api:latest
+  sage-data-api:
+    image: iperezx/sage-data-api:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,16 +9,4 @@ services:
       - db
     ports:
       - "8080:8080"
-    env_file: mysql.env
-
-  db:
-    image: mysql:8
-    env_file: mysql.env
-   
-    volumes:
-      - ${PWD}/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - sage-node-db:/var/lib/mysql
-
-volumes:
-  sage-node-db:
     
