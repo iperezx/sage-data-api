@@ -36,10 +36,11 @@ type data struct {
 }
 
 type pluginMetadata struct {
-	Node   string `json:"node,omitempty"`
-	Host   string `json:"host,omitempty"`
-	Plugin string `json:"plugin,omitempty"`
-	Camera string `json:"camera,omitempty"`
+	Node     string `json:"node,omitempty"`
+	Host     string `json:"host,omitempty"`
+	Plugin   string `json:"plugin,omitempty"`
+	Camera   string `json:"camera,omitempty"`
+	SensorID string `json:"sensorID,omitempty"`
 }
 
 type pluginSage struct {
