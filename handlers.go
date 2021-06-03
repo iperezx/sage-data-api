@@ -54,6 +54,19 @@ type pluginData struct {
 	Metadata []*metadata   `json:"metadata"`
 }
 
+type sensorHardware struct {
+	ID           string `json:"id,omitempty"`
+	Product_name string `json:"product_name,omitempty"`
+	Manufacture  string `json:"manufacture,omitempty"`
+	Sensor_types string `json:"sensor_types,omitempty"`
+	Link         string `json:"link,omitempty"`
+}
+
+type sensorHardwareData struct {
+	Data     []*sensorHardware `json:"data"`
+	Metadata []*metadata       `json:"metadata"`
+}
+
 func getSageNodes(w http.ResponseWriter, r *http.Request) {
 	nodeData := getNodeDataFromCSV(csvFile)
 	var allData data
@@ -155,6 +168,28 @@ func getSagePluginData(w http.ResponseWriter, r *http.Request) {
 	sagePluginData.Metadata = []*metadata{}
 	log.Println("GET: All plugin data")
 	respondJSON(w, http.StatusOK, sagePluginData)
+	return
+}
+
+//Sensor Hardware Data Section
+func getSensorHardwareFromJson(jsonFile string) []*sensorHardware {
+	jsonData, err := os.Open(jsonFile)
+	if err != nil {
+		fmt.Println(err)
+	}
+	byteValue, _ := ioutil.ReadAll(jsonData)
+	data := []*sensorHardware{}
+	json.Unmarshal(byteValue, &data)
+	return data
+}
+
+func getSensorHardwareData(w http.ResponseWriter, r *http.Request) {
+	data := getSensorHardwareFromJson(sensorHardwareFile)
+	var sensorHardware sensorHardwareData
+	sensorHardware.Data = data
+	sensorHardware.Metadata = []*metadata{}
+	log.Println("GET: All sensor hardware data")
+	respondJSON(w, http.StatusOK, sensorHardware)
 	return
 }
 

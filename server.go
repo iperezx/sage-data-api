@@ -10,16 +10,18 @@ import (
 )
 
 var (
-	mainRouter *mux.Router
-	csvFile    string
-	jsonFile   string
-	pluginFile string
+	mainRouter         *mux.Router
+	csvFile            string
+	jsonFile           string
+	pluginFile         string
+	sensorHardwareFile string
 )
 
 func init() {
 	csvFile = "manifest.csv"
 	jsonFile = "dataDict.json"
 	pluginFile = "pluginData.json"
+	sensorHardwareFile = "sensor_hardware.json"
 }
 
 func createRouter() {
@@ -54,6 +56,12 @@ func createRouter() {
 	api.Handle("/plugin-data", negroni.New(
 		negroni.HandlerFunc(authMW),
 		negroni.Wrap(http.HandlerFunc(getSagePluginData)),
+	)).Methods(http.MethodGet)
+
+	// /sensor-hardware
+	api.Handle("/sensor-hardware-data", negroni.New(
+		negroni.HandlerFunc(authMW),
+		negroni.Wrap(http.HandlerFunc(getSensorHardwareData)),
 	)).Methods(http.MethodGet)
 
 	log.Fatalln(http.ListenAndServe(":8080", api))
