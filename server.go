@@ -13,6 +13,7 @@ var (
 	mainRouter         *mux.Router
 	csvFile            string
 	jsonFile           string
+	wildNodesFile      string
 	pluginFile         string
 	sensorHardwareFile string
 )
@@ -20,6 +21,7 @@ var (
 func init() {
 	csvFile = "manifest.csv"
 	jsonFile = "dataDict.json"
+	wildNodesFile = "wild_nodes.json"
 	pluginFile = "pluginData.json"
 	sensorHardwareFile = "sensor_hardware.json"
 }
@@ -36,7 +38,7 @@ func createRouter() {
 	})
 
 	// GET
-	// /nodes
+	// /nodes blades
 	api.Handle("/nodes-data", negroni.New(
 		negroni.HandlerFunc(authMW),
 		negroni.Wrap(http.HandlerFunc(getSageNodes)),
@@ -50,6 +52,12 @@ func createRouter() {
 	api.Handle("/nodes-all", negroni.New(
 		negroni.HandlerFunc(authMW),
 		negroni.Wrap(http.HandlerFunc(getSageNodesAndDataDict)),
+	)).Methods(http.MethodGet)
+
+	// /nodes-wild
+	api.Handle("/nodes-wild-data", negroni.New(
+		negroni.HandlerFunc(authMW),
+		negroni.Wrap(http.HandlerFunc(getWildNodeData)),
 	)).Methods(http.MethodGet)
 
 	// /plugin

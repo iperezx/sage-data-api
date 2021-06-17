@@ -35,6 +35,19 @@ type data struct {
 	Metadata []*metadata `json:"metadata,omitempty"`
 }
 
+type wildNodeSage struct {
+	Name string  `json:"name,omitempty"`
+	ID   string  `json:"id,omitempty"`
+	Vsn  string  `json:"vsn,omitempty"`
+	Lat  float64 `json:"lat,omitempty"`
+	Lon  float64 `json:"lon,omitempty"`
+}
+
+type wildNodedata struct {
+	Data     []*wildNodeSage `json:"data,omitempty"`
+	Metadata []*metadata     `json:"metadata"`
+}
+
 type pluginMetadata struct {
 	Node     string `json:"node,omitempty"`
 	Host     string `json:"host,omitempty"`
@@ -146,6 +159,28 @@ func getSageNodesAndDataDict(w http.ResponseWriter, r *http.Request) {
 	allData.Metadata = metadata
 	log.Println("GET: All nodes data and metadata")
 	respondJSON(w, http.StatusOK, allData)
+	return
+}
+
+//
+func getWildNodeDataFromJson(jsonFile string) []*wildNodeSage {
+	jsonData, err := os.Open(jsonFile)
+	if err != nil {
+		fmt.Println(err)
+	}
+	byteValue, _ := ioutil.ReadAll(jsonData)
+	data := []*wildNodeSage{}
+	json.Unmarshal(byteValue, &data)
+	return data
+}
+
+func getWildNodeData(w http.ResponseWriter, r *http.Request) {
+	data := getWildNodeDataFromJson(wildNodesFile)
+	var wildNodes wildNodedata
+	wildNodes.Data = data
+	wildNodes.Metadata = []*metadata{}
+	log.Println("GET: All wild node data")
+	respondJSON(w, http.StatusOK, wildNodes)
 	return
 }
 
