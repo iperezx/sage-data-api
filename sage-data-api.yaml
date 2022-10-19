@@ -45,19 +45,24 @@ spec:
     protocol: TCP
     targetPort: 8080
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: sage-data-api
-  namespace: sage
   annotations:
-    traefik.ingress.kubernetes.io/router.tls: ""
+    kubernetes.io/ingress.class: haproxy
+  name: sage-data-api
 spec:
   rules:
-  - host: sage-data-api.nautilus.optiputer.net
+  - host: sage-data-api.nrp-nautilus.io
     http:
       paths:
-      - path: /
-        backend:
-          serviceName: sage-data-api
-          servicePort: 8080
+      - backend:
+          service:
+            name: sage-data-api
+            port:
+              number: 8080
+        path: /
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - sage-data-api.nrp-nautilus.io
