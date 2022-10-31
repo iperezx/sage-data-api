@@ -1,0 +1,15 @@
+name,id,status,provisionDate,OSVersion,ServiceTag,SpecialDevices,BIOSVersion,Lat,Lon
+Sage-NEON-01,4cd98fc4d2a8,Up,10/22/20,dell-1.0.0.local-6da62a8,79BBZ23,N/A,2.8.2,40.01631,-105.24585
+Sage-NEON-02,4cd98fc67b75,Up,10/22/20,dell-1.0.0.local-6da62a8,79B9Z23,Camera (10.102.144.41 & 10.110.48.41),2.8.2,40.01631,-105.24585
+Sage-NEON-03,4cd98fc68d9c,Up,10/30/20,dell-1.0.0.local-6da62a8,79BDZ23,Camera (10.110.48.41),2.8.2,40.01631,-105.24585
+Sage-NEON-04,4cd98fc67734,Up,11/2/20,dell-1.0.0.local-6da62a8,79BCZ23,Camera (10.114.16.41),2.8.2,40.01631,-105.24585
+Sage-NEON-05,4cd98fc67a3d,Up,11/3/20,dell-1.0.0.local-6da62a8,79BGZ23,Camera (10.116.128.41 & 10.110.48.41),2.8.2,40.01631,-105.24585
+Sage-NEON-06,4cd98fc67e76,Down/Transport,11/3/20,dell-1.0.0.local-6da62a8,79B8Z23,N/A,2.8.2,40.01631,-105.24585
+Sage-NEON-07,4cd98fc68549,Up,11/4/20,dell-1.0.0.local-6da62a8,79B7Z23,Camera (10.117.48.41 & 10.110.48.41),2.8.2,40.01631,-105.24585
+Sage-NEON-08,4cd98fc686c9,Down/Transport,11/4/20,dell-1.0.0.local-6da62a8,79BFZ23,N/A,2.8.2,40.01631,-105.24585
+Sage-Dev-01,4cd98fb00025,Up,11/16/20,dell-1.0.0.local-6da62a8,8M0BN23,N/A,2.8.2,41.725861,-87.97216
+Sage-Dev-02,4cd98fa8be25,Up,10/22/20,dell-1.0.0.local-6da62a8,8M09N23,N/A,2.8.2,41.725861,-87.97216
+Sage-Dev-03,4cd98fadebf3,Up,10/22/20,dell-1.0.0.local-6da62a8,8M0CN23,N/A,2.8.2,41.725861,-87.97216
+Sage-Chameleon-01,4cd98fb554db,Up,11/4/20,dell-1.0.0.local-6da62a8,8M08N23,N/A,2.8.2,41.725861,-87.97216
+Sage-ARM-01,2cea7f5a2f72,Up,10/28/20,dell-1.0.0.local-6da62a8,11FTQ53,N/A,2.8.2,,
+Sage-TTU-01,2cea7f5a0a3d,Up,11/19/20,dell-1.0.0.local-6da62a8,J42P853,N/A,2.8.2,33.584306,-101.871984

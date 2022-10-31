@@ -19,11 +19,11 @@ var (
 )
 
 func init() {
-	csvFile = "manifest.csv"
-	jsonFile = "dataDict.json"
-	wildNodesFile = "wild_nodes.json"
-	pluginFile = "pluginData.json"
-	sensorHardwareFile = "sensor_hardware.json"
+	csvFile = "init_data/manifest.csv"
+	jsonFile = "init_data/dataDict.json"
+	wildNodesFile = "init_data/wild_nodes.json"
+	pluginFile = "init_data/pluginData.json"
+	sensorHardwareFile = "init_data/sensor_hardware.json"
 }
 
 func createRouter() {

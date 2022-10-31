@@ -1,0 +1,63 @@
+[
+  {
+      "id": "name",
+      "type": "text",
+      "label": "name",
+      "description": "Name of node."
+  },
+  {
+    "id": "id",
+    "type": "text",
+    "label": "id",
+    "description": "Unique id."
+  },
+  {
+    "id": "status",
+    "type": "text",
+    "label": "status",
+    "description": "Status of node."
+  },
+  {
+    "id": "provisionDate",
+    "type": "text",
+    "label": "Provision Date",
+    "description": "Date that the node was provision."
+  },
+  {
+    "id": "OSVersion",
+    "type": "text",
+    "label": "Operating System Version",
+    "description": "Version of Operating System on Node."
+  },
+  {
+    "id": "serviceTag",
+    "type": "text",
+    "label": "Service Tag",
+    "description": "Tag for service."
+  },
+  {
+    "id": "SpecialDevices",
+    "type": "text",
+    "label": "Special Devices",
+    "description": "Special devices connected to the node."
+  },
+  {
+    "id": "BIOSVersion",
+    "type": "text",
+    "label": "BIOSVersion",
+    "description": "Version of BIOS."
+  },
+  {
+    "id": "lat",
+    "type": "numeric",
+    "label": "Latitude",
+    "description": "Latitude of Node."
+  },
+  {
+    "id": "lon",
+    "type": "numeric",
+    "label": "Longitude",
+    "description": "Longitude of Node."
+  }
+]
+

@@ -1,0 +1,51 @@
+[
+ {
+   "id": "000000000",
+   "product_name": "bme680",
+   "manufacture": "Bosch Sensortec",
+   "sensor_types": "relative humidity,barometric pressure,ambient temperature,gas",
+   "link": "https://www.bosch-sensortec.com/products/environmental-sensors/gas-sensors/bme680/"
+ },
+ {
+   "id": "000000001",
+   "product_name": "rg-15",
+   "manufacture": "Hydreon Corporation",
+   "sensor_types": "rainfall measuring device",
+   "link": "https://rainsensors.com/products/rg-15/"
+ },
+ {
+   "id": "000000002",
+   "product_name": "bme280",
+   "manufacture": "Bosch Sensortec",
+   "sensor_types": "relative humidity,barometric pressure,ambient temperature",
+   "link": "https://www.bosch-sensortec.com/products/environmental-sensors/humidity-sensors-bme280/"
+ },
+ {
+   "id": "000000003",
+   "product_name": "xnv-8081z",
+   "manufacture": "Hanwha Techwin America",
+   "sensor_types": "camera",
+   "link": "https://www.hanwhasecurity.com/xnv-8081z.html"
+ },
+ {
+   "id": "000000004",
+   "product_name": "xnf-8010rv",
+   "manufacture": "Hanwha Techwin America",
+   "sensor_types": "camera",
+   "link": "https://www.hanwhasecurity.com/xnf-8010rv.html"
+ },
+ {
+   "id": "000000005",
+   "product_name": "xnv-8080r",
+   "manufacture": "Hanwha Techwin America",
+   "sensor_types": "camera",
+   "link": "https://www.hanwhasecurity.com/xnv-8080r.html"
+ },
+ {
+   "id": "000000006",
+   "product_name": "xnv-8082r",
+   "manufacture": "Hanwha Techwin America",
+   "sensor_types": "camera",
+   "link": "https://www.hanwhasecurity.com/xnv-8082r.html"
+ }
+]
